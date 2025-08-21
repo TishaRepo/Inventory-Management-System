@@ -250,7 +250,9 @@ const MediaSection = () => {
               type="date"
               value={formData.purchase_date}
               onChange={handleChange}
-              min={today}
+              disabled={isEditing}             // non-editable when editing existing item
+              readOnly={isEditing}
+              min={isEditing ? undefined : today}
               required
             />
 
