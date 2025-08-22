@@ -1,4 +1,4 @@
-# Spring8 Inventory System — Local Storage Prototype
+# Inventory System — Local Storage Prototype
 
 Lightweight React + Vite inventory prototype that stores items in the browser (Local Storage). Designed for demo and small-site usage: create, view, edit items, upload photos (saved as base64), generate printable QR codes (photo excluded), and view dashboard statistics.
 

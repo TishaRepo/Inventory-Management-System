@@ -18,13 +18,13 @@ const ItemFormPage = () => {
     item_name: "",
     purchaser_name: "",
     purchase_date: "",
-    purchase_amount: "",
+    purchase_amount: "" ,
     storage_location: "",
     provisional_asset_number: "",
     qr_number: "",
     remarks: "",
     // photo_base64: 
-    final_asset_number: "",
+    
   });
 
   useEffect(() => {
@@ -62,10 +62,14 @@ const ItemFormPage = () => {
         setIsViewing(true);
         toast.success("Item updated successfully!");
       } else {
-        // Create then navigate to the new item's edit page (which initializes view mode)
-        const created = await createItem(formData);
+        // Create: exclude asset fields which must not exist during registration
+        const payload = { ...formData };
+        delete payload.qr_number;
+        delete payload.provisional_asset_number;
+        
+        const created = await createItem(payload);
         toast.success("Item created successfully!");
-        navigate(`/edit/${created._id}`);
+        navigate('/items');
         return; // avoid further navigation
       }
     } catch (error) {
@@ -93,8 +97,7 @@ const ItemFormPage = () => {
       printWindow.document.write(`
                 <html><head><title>Print QR Code</title></head>
                 <body style="text-align: center; margin-top: 50px;">
-                    <h3>${formData.item_name}</h3>
-                    <p>QR Number: ${formData.qr_number}</p>
+                    
                     <img src="${dataUrl}" style="width: 300px; height: 300px;" />
                     <script>window.onload = () => { window.print(); window.close(); };</script>
                 </body></html>
@@ -210,19 +213,27 @@ const MediaSection = () => {
               label="Purchase Amount"
               value={`¥${Number(formData.purchase_amount).toLocaleString()}`}
             />
+            
             <ViewField
               label="Storage Location"
               value={formData.storage_location}
+              isEditing={isEditing}
             />
             <ViewField
-              label="Provisional Asset No."
+              label="Remarks"
+              value={`${String(formData.remarks).toLocaleString()}`}
+            />
+            <ViewField
+              label="Provisional/Final Asset No."
               value={formData.provisional_asset_number}
+              
             />
-            <ViewField label="QR Number" value={formData.qr_number} />
-            <ViewField
-              label="Final Asset No. (Barcode)"
-              value={formData.final_asset_number}
+            <ViewField 
+            label="QR Number" 
+            value={formData.qr_number} 
+             // Show QR Number only when viewing or editing
             />
+            
           </div>
         </div>
       ) : (
@@ -255,7 +266,6 @@ const MediaSection = () => {
               min={isEditing ? undefined : today}
               required
             />
-
             <FormField
               label="Purchase Amount (JPY)"
               name="purchase_amount"
@@ -264,6 +274,7 @@ const MediaSection = () => {
               onChange={handleChange}
               required
             />
+            
             <FormField
               label="Storage Location"
               name="storage_location"
@@ -271,23 +282,31 @@ const MediaSection = () => {
               onChange={handleChange}
             />
             <FormField
-              label="Provisional Asset Number"
-              name="provisional_asset_number"
-              value={formData.provisional_asset_number}
+              label="Remarks"
+              name="remarks"
+              type="string"
+              value={formData.remarks}
               onChange={handleChange}
+              
             />
-            <FormField
-              label="QR Number"
-              name="qr_number"
-              value={formData.qr_number}
-              onChange={handleChange}
-            />
-            <FormField
-              label="Final Asset Number (Barcode)"
-              name="final_asset_number"
-              value={formData.final_asset_number}
-              onChange={handleChange}
-            />
+            {/* Asset fields only visible when editing */}
+            {isEditing && (
+              <>
+                <FormField
+                  label="Provisional/Final Asset Number"
+                  name="provisional_asset_number/final_asset_number"
+                  value={formData.provisional_asset_number}
+                  onChange={handleChange}
+                />
+                <FormField
+                  label="QR Number"
+                  name="qr_number"
+                  value={formData.qr_number}
+                  onChange={handleChange}
+                />
+                
+              </>
+            )}
           </div>
 
           <div className="form-actions">

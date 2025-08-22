@@ -27,7 +27,10 @@ export const getItems = async (searchTerm = '', searchField = 'all') => {
                     item.item_name.toLowerCase().includes(lowercasedTerm) ||
                     item.document_number.toLowerCase().includes(lowercasedTerm) ||
                     (item.provisional_asset_number || '').toLowerCase().includes(lowercasedTerm) ||
-                    (item.qr_number || '').toLowerCase().includes(lowercasedTerm)
+                    (item.qr_number || '').toLowerCase().includes(lowercasedTerm) ||
+                    (item.storage_location || '').toLowerCase().includes(lowercasedTerm) ||
+                    (item.purchaser_name || '').toLowerCase().includes(lowercasedTerm)
+
                 );
             } else {
                 // Search in a specific field
@@ -47,12 +50,23 @@ export const getItem = async (id) => {
 
 export const createItem = async (itemData) => {
     const items = readItems();
-    const newItem = {
-        ...itemData,
-        _id: `item_${Date.now()}`,
-        document_number: `${new Date().toISOString().slice(0, 10)}-${Date.now()}`,
-        createdAt: Date.now()
-    };
+    const formatDate = (date) => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}/${month}/${day}`;
+};
+
+// Create a unique numeric ID
+const uniqueId = Date.now(); // you can append Math.random() if needed for extra uniqueness
+
+const newItem = {
+    ...itemData,
+    _id:  `item_${Math.floor(Math.random() * 1000)}`, // unique numeric ID
+    document_number:  `${new Date().toISOString().slice(0, 10)}-${Date.now()}`,
+    createdAt: formatDate(Date.now()) // yyyy/mm/dd format
+};
     writeItems([...items, newItem]);
     return newItem;
 };
@@ -87,8 +101,8 @@ export const getDashboardStats = async () => {
                 missing.push('Location');
             }
             // As per spec, Final Asset Number is important for items over ¥200,000
-            if (item.purchase_amount > 200000 && !item.final_asset_number) {
-                missing.push('Final Asset No.');
+            if (!item.provisional_asset_number) {
+                missing.push('Provisional/Final Asset No.');
             }
 
             // If the 'missing' array has any items, we return the item

@@ -41,7 +41,7 @@ const ItemListPage = () => {
                         <option value="all">All Fields</option>
                         <option value="item_name">Item Name</option>
                         <option value="qr_number">QR Number</option>
-                        <option value="provisional_asset_number">Provisional Asset No.</option>
+                        <option value="provisional_asset_number">Provisional/Final Asset No.</option>
                         <option value="document_number">Document No.</option>
                     </select>
                     <input
